@@ -47,16 +47,69 @@ func Login(c echo.Context) error {
 
 	userID := strconv.FormatUint(uint64(user.ID), 10)
 
-	claims := &jwt.RegisteredClaims{
+	accessTokenClaims := &jwt.RegisteredClaims{
 		Subject:   userID,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString([]byte(configs.AppConfig.JWTSecretKey))
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
+	accessTokenString, err := accessToken.SignedString([]byte(configs.AppConfig.JWTSecretKey))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Could not generate token"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Could not generate access token"})
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"token": tokenString})
+	refreshTokenClaims := &jwt.RegisteredClaims{
+		Subject:   userID,
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(7 * 24 * time.Hour)),
+	}
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
+	refreshTokenString, err := refreshToken.SignedString([]byte(configs.AppConfig.JWTSecretKey))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Could not generate refresh token"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"access_token":  accessTokenString,
+		"refresh_token": refreshTokenString,
+	})
+}
+
+func RefreshToken(c echo.Context) error {
+	var body struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+	if err := c.Bind(&body); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid input"})
+	}
+
+	token, err := jwt.Parse(body.RefreshToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, echo.NewHTTPError(http.StatusUnauthorized, "Invalid refresh token")
+		}
+		return []byte(configs.AppConfig.JWTSecretKey), nil
+	})
+
+	if err != nil || !token.Valid {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid or expired refresh token"})
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token claims"})
+	}
+
+	userID := claims["sub"].(string)
+
+	accessTokenClaims := &jwt.RegisteredClaims{
+		Subject:   userID,
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+	}
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
+	accessTokenString, err := accessToken.SignedString([]byte(configs.AppConfig.JWTSecretKey))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Could not generate access token"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"access_token": accessTokenString,
+	})
 }

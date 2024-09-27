@@ -28,6 +28,7 @@ func main() {
 	// Kayıt ve giriş rotaları
 	e.POST("/register", handlers.Register)
 	e.POST("/login", handlers.Login)
+	e.POST("/refresh-token", handlers.RefreshToken)
 
 	// JWT ile korunan bir rota
 	e.GET("/protected", func(c echo.Context) error {
