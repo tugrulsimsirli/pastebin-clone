@@ -1,7 +1,7 @@
 version: '3'
 services:
   db:
-    image: postgres
+    image: postgres:latest
     environment:
       POSTGRES_USER: pastebin
       POSTGRES_PASSWORD: pastebin
@@ -10,6 +10,25 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pastebin -d pastebin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env  # .env dosyasını burada kullanıyoruz (JWT secret key)
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app  # Proje dosyalarını container'a mount ediyoruz
+      - ./config.yml:/root/config.yml  # config.yml dosyasını Docker container içine mount ediyoruz
+    command: ["./pastebin-clone"]
 
 volumes:
   db_data:

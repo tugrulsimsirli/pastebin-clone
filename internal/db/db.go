@@ -1,8 +1,10 @@
 package db
 
 import (
+	"fmt"
 	"log"
-	"pastebin-clone/internal/models"
+	"pastebin-clone/configs"
+	"pastebin-clone/internal/db/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -11,7 +13,15 @@ import (
 var DB *gorm.DB
 
 func ConnectDB() {
-	dsn := "host=localhost user=pastebin password=pastebin dbname=pastebin port=5432 sslmode=disable"
+	// Veritabanı bağlantı bilgilerini config'ten alıyoruz
+	dbConfig := configs.AppConfig.DBConfig
+
+	// DSN (Data Source Name) oluşturuluyor
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		dbConfig.Host, dbConfig.User, dbConfig.Password, dbConfig.DBName, dbConfig.Port, dbConfig.SSLMode,
+	)
+
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -21,6 +31,9 @@ func ConnectDB() {
 }
 
 func MigrateDB() {
-	DB.AutoMigrate(&models.User{}, &models.Snippet{})
-	log.Println("Database migration completed")
+	err := DB.AutoMigrate(&models.User{}, &models.Snippet{})
+	if err != nil {
+		log.Fatal("Migration failed: ", err)
+	}
+	log.Println("Migration completed successfully")
 }

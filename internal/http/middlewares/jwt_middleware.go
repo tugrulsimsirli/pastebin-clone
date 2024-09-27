@@ -5,6 +5,7 @@ import (
 	"pastebin-clone/configs"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -28,6 +29,23 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil || !token.Valid {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid or expired token"})
 		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token claims"})
+		}
+
+		userIDStr, ok := claims["sub"].(string)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid user ID in token"})
+		}
+
+		userID, err := uuid.Parse(userIDStr)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid user ID format"})
+		}
+
+		c.Set("userID", userID)
 
 		return next(c)
 	}
