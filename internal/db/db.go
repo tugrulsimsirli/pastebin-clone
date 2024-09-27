@@ -20,7 +20,6 @@ func ConnectDB() {
 	log.Println("Database connection established")
 }
 
-// Migrasyon işlemi
 func MigrateDB() {
 	DB.AutoMigrate(&models.User{}, &models.Snippet{})
 	log.Println("Database migration completed")

@@ -12,18 +12,15 @@ type Config struct {
 
 var AppConfig Config
 
-// Config dosyasını yükleyen fonksiyon
 func LoadConfig() {
-	viper.SetConfigName("config") // config dosyasının adı
-	viper.SetConfigType("yaml")   // config dosyasının türü
-	viper.AddConfigPath(".")      // config dosyasının yolunu belirle (. = kök dizin)
+	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
+	viper.AddConfigPath(".")
 
-	// Config dosyasını okuma
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)
 	}
 
-	// Config dosyasını yapılandırmaya map etme
 	if err := viper.Unmarshal(&AppConfig); err != nil {
 		log.Fatalf("Unable to decode into struct, %v", err)
 	}
