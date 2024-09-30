@@ -4,7 +4,8 @@ import (
 	"pastebin-clone/configs"
 	"pastebin-clone/internal/db"
 	"pastebin-clone/internal/http/handlers"
-	"pastebin-clone/internal/http/middlewares"
+	"pastebin-clone/internal/repositories"
+	"pastebin-clone/internal/services"
 
 	"github.com/labstack/echo/v4"
 
@@ -27,15 +28,13 @@ func main() {
 		return c.JSON(200, map[string]string{"message": "API is up and running!"})
 	})
 
-	e.POST("/register", handlers.Register)
-	e.POST("/login", handlers.Login)
-	e.POST("/refresh-token", handlers.RefreshToken)
+	authRepo := repositories.NewAuthRepository()
+	authService := services.NewAuthService(authRepo)
+	authHandler := handlers.NewAuthHandler(authService)
 
-	e.POST("/snippet", handlers.CreateSnippet)
-
-	e.GET("/protected", func(c echo.Context) error {
-		return c.JSON(200, map[string]string{"message": "Welcome to the protected route!"})
-	}, middlewares.JWTMiddleware)
+	e.POST("/register", authHandler.Register)
+	e.POST("/login", authHandler.Login)
+	e.POST("/refresh-token", authHandler.RefreshToken)
 
 	e.Start(":8080")
 }

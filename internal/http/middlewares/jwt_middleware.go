@@ -35,6 +35,11 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token claims"})
 		}
 
+		tokenType, ok := claims["type"].(string)
+		if !ok || tokenType != "access" {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token type"})
+		}
+
 		userIDStr, ok := claims["sub"].(string)
 		if !ok {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid user ID in token"})

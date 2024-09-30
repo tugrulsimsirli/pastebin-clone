@@ -12,27 +12,24 @@ type RegisterResponseModel struct {
 }
 
 type LoginRequestModel struct {
-	Username string `json:"username" example:"userName"`
+	Username string `json:"username" example:"johndoe"`
 	Password string `json:"password" example:"password"`
 }
 
-type RefreshTokenRequest struct {
-	RefreshToken string `json:"refresh_token" example:"some-refresh-token"`
+type LoginResponseModel struct {
+	AccessToken  string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."`
+	RefreshToken string `json:"refresh_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
+	ExpireDate   string `json:"expire_date" example:"1970-01-01 00:00:00"`
 }
 
-// SuccessResponse represents a successful response with a message
-type SuccessResponse struct {
-	Message string `json:"message" example:"User registered successfully"`
+type RefreshTokenRequestModel struct {
+	RefreshToken string `json:"refresh_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."`
 }
 
-// TokenResponse represents the response with a JWT token
-type TokenResponse struct {
-	Token string `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"`
-}
-
-// AccessTokenResponse represents the response with an access token
-type AccessTokenResponse struct {
-	AccessToken string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"`
+type RefreshTokenResponseModel struct {
+	AccessToken  string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."`
+	RefreshToken string `json:"refresh_token,omitempty" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."` // Opsiyonel
+	ExpireDate   string `json:"expire_date" example:"1970-01-01 00:00:00"`
 }
 
 // ErrorResponse represents a generic error response

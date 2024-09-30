@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.LoginRequestModel"
                         }
                     }
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TokenResponse"
+                            "$ref": "#/definitions/models.LoginResponseModel"
                         }
                     },
                     "400": {
@@ -81,7 +81,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RefreshTokenRequest"
+                            "$ref": "#/definitions/models.RefreshTokenRequestModel"
                         }
                     }
                 ],
@@ -89,7 +89,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessTokenResponse"
+                            "$ref": "#/definitions/models.RefreshTokenResponseModel"
                         }
                     },
                     "400": {
@@ -155,15 +155,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.AccessTokenResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                }
-            }
-        },
         "models.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -173,12 +164,60 @@ const docTemplate = `{
                 }
             }
         },
-        "models.RefreshTokenRequest": {
+        "models.LoginRequestModel": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "johndoe"
+                }
+            }
+        },
+        "models.LoginResponseModel": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."
+                },
+                "expire_date": {
+                    "type": "string",
+                    "example": "1970-01-01 00:00:00"
+                },
+                "refresh_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "models.RefreshTokenRequestModel": {
             "type": "object",
             "properties": {
                 "refresh_token": {
                     "type": "string",
-                    "example": "some-refresh-token"
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."
+                }
+            }
+        },
+        "models.RefreshTokenResponseModel": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."
+                },
+                "expire_date": {
+                    "type": "string",
+                    "example": "1970-01-01 00:00:00"
+                },
+                "refresh_token": {
+                    "description": "Opsiyonel",
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."
                 }
             }
         },
@@ -201,32 +240,6 @@ const docTemplate = `{
                 "id": {
                     "type": "string",
                     "example": "b8bba550-3b82-4fa8-9617-8d3c0ab69989"
-                }
-            }
-        },
-        "models.TokenResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "example": "b8bba550-3b82-4fa8-9617-8d3c0ab69989"
-                },
-                "password": {
-                    "type": "string",
-                    "example": "password"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "johndoe"
                 }
             }
         }

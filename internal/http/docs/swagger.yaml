@@ -1,20 +1,48 @@
 definitions:
-  models.AccessTokenResponse:
-    properties:
-      access_token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-        type: string
-    type: object
   models.ErrorResponse:
     properties:
       message:
         example: Invalid credentials
         type: string
     type: object
-  models.RefreshTokenRequest:
+  models.LoginRequestModel:
+    properties:
+      password:
+        example: password
+        type: string
+      username:
+        example: johndoe
+        type: string
+    type: object
+  models.LoginResponseModel:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ...
+        type: string
+      expire_date:
+        example: "1970-01-01 00:00:00"
+        type: string
+      refresh_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  models.RefreshTokenRequestModel:
     properties:
       refresh_token:
-        example: some-refresh-token
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ...
+        type: string
+    type: object
+  models.RefreshTokenResponseModel:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ...
+        type: string
+      expire_date:
+        example: "1970-01-01 00:00:00"
+        type: string
+      refresh_token:
+        description: Opsiyonel
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ...
         type: string
     type: object
   models.RegisterRequestModel:
@@ -32,24 +60,6 @@ definitions:
         example: b8bba550-3b82-4fa8-9617-8d3c0ab69989
         type: string
     type: object
-  models.TokenResponse:
-    properties:
-      token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-        type: string
-    type: object
-  models.User:
-    properties:
-      id:
-        example: b8bba550-3b82-4fa8-9617-8d3c0ab69989
-        type: string
-      password:
-        example: password
-        type: string
-      username:
-        example: johndoe
-        type: string
-    type: object
 info:
   contact: {}
 paths:
@@ -64,14 +74,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.LoginRequestModel'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.TokenResponse'
+            $ref: '#/definitions/models.LoginResponseModel'
         "400":
           description: Bad Request
           schema:
@@ -94,14 +104,14 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/models.RefreshTokenRequest'
+          $ref: '#/definitions/models.RefreshTokenRequestModel'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AccessTokenResponse'
+            $ref: '#/definitions/models.RefreshTokenResponseModel'
         "400":
           description: Bad Request
           schema:

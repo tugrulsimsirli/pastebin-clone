@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"pastebin-clone/configs"
-	"pastebin-clone/internal/db/models"
+	models "pastebin-clone/internal/db/data-models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
