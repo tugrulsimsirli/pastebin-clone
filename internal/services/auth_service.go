@@ -1,4 +1,3 @@
-// auth_service.go
 package services
 
 import (
@@ -24,7 +23,6 @@ type AuthService struct {
 	UserRepo repositories.UserRepositoryInterface
 }
 
-// Dönüş tipi sadece AuthServiceInterface olacak şekilde düzeltildi
 func NewAuthService(authRepo repositories.AuthRepositoryInterface, userRepo repositories.UserRepositoryInterface) AuthServiceInterface {
 	return &AuthService{
 		AuthRepo: authRepo,

@@ -1,4 +1,3 @@
-// internal/services/snippet_service.go
 package services
 
 import (
@@ -135,12 +134,10 @@ func (s *SnippetService) UpdateSnippet(userID uuid.UUID, snippetID uuid.UUID, re
 }
 
 func (s *SnippetService) DeleteSnippet(userID uuid.UUID, snippetID uuid.UUID) error {
-	// First, get the snippet to ensure it's owned by the user
 	snippet, err := s.Repo.GetSnippetByID(userID, snippetID)
 	if err != nil {
 		return err
 	}
 
-	// Proceed to delete
 	return s.Repo.DeleteSnippet(snippet.ID)
 }
