@@ -67,7 +67,7 @@ func (h *SnippetHandler) GetSnippet(c echo.Context) error {
 // @Accept       json
 // @Produce      json
 // @Param        snippet body models.CreateSnippetRequestModel true "Snippet data"
-// @Success      201  {object} models.SnippetResponseModel
+// @Success      201  {object} models.IdResponseModel
 // @Failure      400  {object} models.ErrorResponse
 // @Failure      500  {object} models.ErrorResponse
 // @Router       /api/v1/snippet [post]

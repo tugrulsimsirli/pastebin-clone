@@ -3,6 +3,7 @@ package services
 import (
 	data_models "pastebin-clone/internal/db/data-models"
 	"pastebin-clone/internal/http/models"
+	"pastebin-clone/internal/mapper"
 	"pastebin-clone/internal/repositories"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 type SnippetServiceInterface interface {
 	GetAllSnippetsByUser(userID uuid.UUID) ([]models.SnippetResponseModel, error)
 	GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (*models.SnippetResponseModel, error)
-	CreateSnippet(userID uuid.UUID, req models.CreateSnippetRequestModel) (*models.SnippetResponseModel, error)
+	CreateSnippet(userID uuid.UUID, req models.CreateSnippetRequestModel) (*models.IdResponseModel, error)
 	UpdateSnippet(userID uuid.UUID, snippetID uuid.UUID, req models.UpdateSnippetRequestModel) (*models.SnippetResponseModel, error)
 	DeleteSnippet(userID uuid.UUID, snippetID uuid.UUID) error
 }
@@ -34,16 +35,10 @@ func (s *SnippetService) GetAllSnippetsByUser(userID uuid.UUID) ([]models.Snippe
 	}
 
 	var response []models.SnippetResponseModel
-	for _, snippet := range snippets {
-		response = append(response, models.SnippetResponseModel{
-			ID:           snippet.ID,
-			Title:        snippet.Title,
-			Content:      snippet.Content,
-			ViewCount:    snippet.ViewCount,
-			CreatedDate:  snippet.CreatedDate,
-			ModifiedDate: snippet.ModifiedDate,
-			IsDeleted:    snippet.IsDeleted,
-		})
+
+	err = mapper.Map(snippets, &response)
+	if err != nil {
+		return nil, err
 	}
 
 	return response, nil
@@ -55,20 +50,21 @@ func (s *SnippetService) GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (
 		return nil, err
 	}
 
-	return &models.SnippetResponseModel{
-		ID:           snippet.ID,
-		Title:        snippet.Title,
-		Content:      snippet.Content,
-		ViewCount:    snippet.ViewCount,
-		CreatedDate:  snippet.CreatedDate,
-		ModifiedDate: snippet.ModifiedDate,
-		IsDeleted:    snippet.IsDeleted,
-	}, nil
+	var response *models.SnippetResponseModel
+
+	err = mapper.Map(snippet, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
-func (s *SnippetService) CreateSnippet(userID uuid.UUID, req models.CreateSnippetRequestModel) (*models.SnippetResponseModel, error) {
+func (s *SnippetService) CreateSnippet(userID uuid.UUID, req models.CreateSnippetRequestModel) (*models.IdResponseModel, error) {
+	id := uuid.New()
+
 	snippet := &data_models.Snippet{
-		ID:           uuid.New(),
+		ID:           id,
 		UserID:       userID,
 		Title:        req.Title,
 		Content:      req.Content,
@@ -78,20 +74,16 @@ func (s *SnippetService) CreateSnippet(userID uuid.UUID, req models.CreateSnippe
 		IsDeleted:    false,
 	}
 
-	createdSnippet, err := s.Repo.CreateSnippet(snippet)
+	err := s.Repo.CreateSnippet(snippet)
 	if err != nil {
 		return nil, err
 	}
 
-	return &models.SnippetResponseModel{
-		ID:           createdSnippet.ID,
-		Title:        createdSnippet.Title,
-		Content:      createdSnippet.Content,
-		ViewCount:    createdSnippet.ViewCount,
-		CreatedDate:  createdSnippet.CreatedDate,
-		ModifiedDate: createdSnippet.ModifiedDate,
-		IsDeleted:    createdSnippet.IsDeleted,
-	}, nil
+	response := &models.IdResponseModel{
+		ID: id,
+	}
+
+	return response, nil
 }
 
 func (s *SnippetService) UpdateSnippet(userID uuid.UUID, snippetID uuid.UUID, req models.UpdateSnippetRequestModel) (*models.SnippetResponseModel, error) {
@@ -122,15 +114,14 @@ func (s *SnippetService) UpdateSnippet(userID uuid.UUID, snippetID uuid.UUID, re
 		return nil, err
 	}
 
-	return &models.SnippetResponseModel{
-		ID:           updatedSnippet.ID,
-		Title:        updatedSnippet.Title,
-		Content:      updatedSnippet.Content,
-		ViewCount:    updatedSnippet.ViewCount,
-		CreatedDate:  updatedSnippet.CreatedDate,
-		ModifiedDate: updatedSnippet.ModifiedDate,
-		IsDeleted:    updatedSnippet.IsDeleted,
-	}, nil
+	var response *models.SnippetResponseModel
+
+	err = mapper.Map(updatedSnippet, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
 func (s *SnippetService) DeleteSnippet(userID uuid.UUID, snippetID uuid.UUID) error {

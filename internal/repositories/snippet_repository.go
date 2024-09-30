@@ -3,6 +3,7 @@ package repositories
 import (
 	"pastebin-clone/internal/db"
 	data_models "pastebin-clone/internal/db/data-models"
+	"pastebin-clone/internal/mapper"
 	"pastebin-clone/internal/repositories/dto"
 
 	"github.com/google/uuid"
@@ -11,7 +12,7 @@ import (
 type SnippetRepositoryInterface interface {
 	GetAllSnippetsByUser(userID uuid.UUID) ([]dto.SnippetDto, error)
 	GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (*dto.SnippetDto, error)
-	CreateSnippet(snippet *data_models.Snippet) (*dto.SnippetDto, error)
+	CreateSnippet(snippet *data_models.Snippet) error
 	UpdateSnippet(snippet *data_models.Snippet) (*dto.SnippetDto, error)
 	DeleteSnippet(snippetID uuid.UUID) error
 }
@@ -28,21 +29,14 @@ func (r *SnippetRepository) GetAllSnippetsByUser(userID uuid.UUID) ([]dto.Snippe
 		return nil, err
 	}
 
-	var snippetDtos []dto.SnippetDto
-	for _, snippet := range snippets {
-		snippetDtos = append(snippetDtos, dto.SnippetDto{
-			ID:           snippet.ID,
-			UserID:       snippet.UserID,
-			Title:        snippet.Title,
-			Content:      snippet.Content,
-			ViewCount:    snippet.ViewCount,
-			CreatedDate:  snippet.CreatedDate,
-			ModifiedDate: snippet.ModifiedDate,
-			IsDeleted:    snippet.IsDeleted,
-		})
+	var response []dto.SnippetDto
+
+	err := mapper.Map(snippets, &response)
+	if err != nil {
+		return nil, err
 	}
 
-	return snippetDtos, nil
+	return response, nil
 }
 
 func (r *SnippetRepository) GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (*dto.SnippetDto, error) {
@@ -51,33 +45,22 @@ func (r *SnippetRepository) GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID
 		return nil, err
 	}
 
-	return &dto.SnippetDto{
-		ID:           snippet.ID,
-		UserID:       snippet.UserID,
-		Title:        snippet.Title,
-		Content:      snippet.Content,
-		ViewCount:    snippet.ViewCount,
-		CreatedDate:  snippet.CreatedDate,
-		ModifiedDate: snippet.ModifiedDate,
-		IsDeleted:    snippet.IsDeleted,
-	}, nil
-}
+	var response *dto.SnippetDto
 
-func (r *SnippetRepository) CreateSnippet(snippet *data_models.Snippet) (*dto.SnippetDto, error) {
-	if err := db.DB.Create(snippet).Error; err != nil {
+	err := mapper.Map(snippet, &response)
+	if err != nil {
 		return nil, err
 	}
 
-	return &dto.SnippetDto{
-		ID:           snippet.ID,
-		UserID:       snippet.UserID,
-		Title:        snippet.Title,
-		Content:      snippet.Content,
-		ViewCount:    snippet.ViewCount,
-		CreatedDate:  snippet.CreatedDate,
-		ModifiedDate: snippet.ModifiedDate,
-		IsDeleted:    snippet.IsDeleted,
-	}, nil
+	return response, nil
+}
+
+func (r *SnippetRepository) CreateSnippet(snippet *data_models.Snippet) error {
+	if err := db.DB.Create(snippet).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *SnippetRepository) UpdateSnippet(snippet *data_models.Snippet) (*dto.SnippetDto, error) {
@@ -85,16 +68,14 @@ func (r *SnippetRepository) UpdateSnippet(snippet *data_models.Snippet) (*dto.Sn
 		return nil, err
 	}
 
-	return &dto.SnippetDto{
-		ID:           snippet.ID,
-		UserID:       snippet.UserID,
-		Title:        snippet.Title,
-		Content:      snippet.Content,
-		ViewCount:    snippet.ViewCount,
-		CreatedDate:  snippet.CreatedDate,
-		ModifiedDate: snippet.ModifiedDate,
-		IsDeleted:    snippet.IsDeleted,
-	}, nil
+	var response *dto.SnippetDto
+
+	err := mapper.Map(snippet, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
 func (r *SnippetRepository) DeleteSnippet(snippetID uuid.UUID) error {

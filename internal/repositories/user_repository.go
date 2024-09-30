@@ -3,6 +3,7 @@ package repositories
 import (
 	"pastebin-clone/internal/db"
 	data_models "pastebin-clone/internal/db/data-models"
+	"pastebin-clone/internal/mapper"
 	"pastebin-clone/internal/repositories/dto"
 )
 
@@ -22,11 +23,12 @@ func (r *UserRepository) GetUserByUsername(username string) (*dto.UserDto, error
 		return nil, err
 	}
 
-	var response dto.UserDto
+	var response *dto.UserDto
 
-	response.ID = user.ID
-	response.Username = user.Username
-	response.Password = user.Password
+	err := mapper.Map(user, &response)
+	if err != nil {
+		return nil, err
+	}
 
-	return &response, nil
+	return response, nil
 }
