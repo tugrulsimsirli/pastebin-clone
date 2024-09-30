@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"fmt"
 	"pastebin-clone/internal/db"
 	data_models "pastebin-clone/internal/db/data-models"
 	"pastebin-clone/internal/mapper"
@@ -30,8 +29,6 @@ func (r *UserRepository) GetUserByUsername(username string) (*dto.UserDto, error
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(response)
 
 	return response, nil
 }

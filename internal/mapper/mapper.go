@@ -65,10 +65,6 @@ func mapSlice(srcVal reflect.Value, dstVal reflect.Value) error {
 		srcElem := srcVal.Index(i)
 		dstElem := newSlice.Index(i)
 
-		fmt.Println("Mapping slice element:", i)
-
-		fmt.Println(newSlice)
-		fmt.Println(reflect.Ptr)
 		// Eleman pointer ise veya adreslenebilir değilse, farklı şekilde işleyelim
 		if srcElem.Kind() == reflect.Ptr && !srcElem.IsNil() {
 			fmt.Println("Processing pointer type")
