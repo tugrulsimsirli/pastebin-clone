@@ -25,7 +25,3 @@ type SnippetResponseModel struct {
 	ModifiedDate time.Time `json:"modified_date"`
 	IsDeleted    bool      `json:"is_deleted"`
 }
-
-type SnippetListResponseModel struct {
-	Snippets []SnippetResponseModel `json:"snippets"`
-}

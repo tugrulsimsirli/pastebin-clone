@@ -41,11 +41,11 @@ func (s *AuthService) RegisterUser(username string, password string) (uuid.UUID,
 func (s *AuthService) Login(username string, password string) (*models.LoginResponseModel, error) {
 	storedUser, err := s.UserRepo.GetUserByUsername(username)
 	if err != nil {
-		return nil, errors.New("invalid credentials")
+		return nil, err
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(password)); err != nil {
-		return nil, errors.New("invalid credentials")
+		return nil, err
 	}
 
 	accessToken, accessTokenClaims, err := createToken(storedUser.ID.String(), time.Now().Add(15*time.Minute).Unix(), "access")

@@ -26,7 +26,7 @@ func NewSnippetHandler(snippetService services.SnippetServiceInterface) *Snippet
 // @Tags         Snippet
 // @Accept       json
 // @Produce      json
-// @Success      200  {object} models.SnippetListResponseModel
+// @Success      200  {object} []models.SnippetResponseModel
 // @Failure      400  {object} models.ErrorResponse
 // @Failure      500  {object} models.ErrorResponse
 // @Router       /api/v1/snippet [get]
@@ -36,7 +36,7 @@ func (h *SnippetHandler) GetSnippets(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: err.Error()})
 	}
-	return c.JSON(http.StatusOK, models.SnippetListResponseModel{Snippets: snippets})
+	return c.JSON(http.StatusOK, snippets)
 }
 
 // GetSnippet godoc

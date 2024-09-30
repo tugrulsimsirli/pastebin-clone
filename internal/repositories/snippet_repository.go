@@ -10,7 +10,7 @@ import (
 )
 
 type SnippetRepositoryInterface interface {
-	GetAllSnippetsByUser(userID uuid.UUID) ([]dto.SnippetDto, error)
+	GetAllSnippetsByUser(userID uuid.UUID) (*[]dto.SnippetDto, error)
 	GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (*dto.SnippetDto, error)
 	CreateSnippet(snippet *data_models.Snippet) error
 	UpdateSnippet(snippet *data_models.Snippet) (*dto.SnippetDto, error)
@@ -23,15 +23,15 @@ func NewSnippetRepository() SnippetRepositoryInterface {
 	return &SnippetRepository{}
 }
 
-func (r *SnippetRepository) GetAllSnippetsByUser(userID uuid.UUID) ([]dto.SnippetDto, error) {
+func (r *SnippetRepository) GetAllSnippetsByUser(userID uuid.UUID) (*[]dto.SnippetDto, error) {
 	var snippets []data_models.Snippet
 	if err := db.DB.Where("user_id = ?", userID).Find(&snippets).Error; err != nil {
 		return nil, err
 	}
 
-	var response []dto.SnippetDto
+	response := &[]dto.SnippetDto{}
 
-	err := mapper.Map(snippets, &response)
+	err := mapper.Map(snippets, response)
 	if err != nil {
 		return nil, err
 	}
@@ -45,9 +45,9 @@ func (r *SnippetRepository) GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID
 		return nil, err
 	}
 
-	var response *dto.SnippetDto
+	response := &dto.SnippetDto{}
 
-	err := mapper.Map(snippet, &response)
+	err := mapper.Map(snippet, response)
 	if err != nil {
 		return nil, err
 	}
@@ -68,9 +68,9 @@ func (r *SnippetRepository) UpdateSnippet(snippet *data_models.Snippet) (*dto.Sn
 		return nil, err
 	}
 
-	var response *dto.SnippetDto
+	response := &dto.SnippetDto{}
 
-	err := mapper.Map(snippet, &response)
+	err := mapper.Map(snippet, response)
 	if err != nil {
 		return nil, err
 	}

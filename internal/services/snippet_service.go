@@ -11,7 +11,7 @@ import (
 )
 
 type SnippetServiceInterface interface {
-	GetAllSnippetsByUser(userID uuid.UUID) ([]models.SnippetResponseModel, error)
+	GetAllSnippetsByUser(userID uuid.UUID) (*[]models.SnippetResponseModel, error)
 	GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (*models.SnippetResponseModel, error)
 	CreateSnippet(userID uuid.UUID, req models.CreateSnippetRequestModel) (*models.IdResponseModel, error)
 	UpdateSnippet(userID uuid.UUID, snippetID uuid.UUID, req models.UpdateSnippetRequestModel) (*models.SnippetResponseModel, error)
@@ -28,15 +28,15 @@ func NewSnippetService(repo repositories.SnippetRepositoryInterface) SnippetServ
 	}
 }
 
-func (s *SnippetService) GetAllSnippetsByUser(userID uuid.UUID) ([]models.SnippetResponseModel, error) {
+func (s *SnippetService) GetAllSnippetsByUser(userID uuid.UUID) (*[]models.SnippetResponseModel, error) {
 	snippets, err := s.Repo.GetAllSnippetsByUser(userID)
 	if err != nil {
 		return nil, err
 	}
 
-	var response []models.SnippetResponseModel
+	response := &[]models.SnippetResponseModel{}
 
-	err = mapper.Map(snippets, &response)
+	err = mapper.Map(snippets, response)
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +50,9 @@ func (s *SnippetService) GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (
 		return nil, err
 	}
 
-	var response *models.SnippetResponseModel
+	response := &models.SnippetResponseModel{}
 
-	err = mapper.Map(snippet, &response)
+	err = mapper.Map(snippet, response)
 	if err != nil {
 		return nil, err
 	}
@@ -114,9 +114,9 @@ func (s *SnippetService) UpdateSnippet(userID uuid.UUID, snippetID uuid.UUID, re
 		return nil, err
 	}
 
-	var response *models.SnippetResponseModel
+	response := &models.SnippetResponseModel{}
 
-	err = mapper.Map(updatedSnippet, &response)
+	err = mapper.Map(updatedSnippet, response)
 	if err != nil {
 		return nil, err
 	}

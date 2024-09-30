@@ -170,7 +170,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SnippetListResponseModel"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SnippetResponseModel"
+                            }
                         }
                     },
                     "400": {
@@ -214,7 +217,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.SnippetResponseModel"
+                            "$ref": "#/definitions/models.IdResponseModel"
                         }
                     },
                     "400": {
@@ -390,6 +393,15 @@ const docTemplate = `{
                 }
             }
         },
+        "models.IdResponseModel": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "b8bba550-3b82-4fa8-9617-8d3c0ab69989"
+                }
+            }
+        },
         "models.LoginRequestModel": {
             "type": "object",
             "properties": {
@@ -466,17 +478,6 @@ const docTemplate = `{
                 "id": {
                     "type": "string",
                     "example": "b8bba550-3b82-4fa8-9617-8d3c0ab69989"
-                }
-            }
-        },
-        "models.SnippetListResponseModel": {
-            "type": "object",
-            "properties": {
-                "snippets": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.SnippetResponseModel"
-                    }
                 }
             }
         },

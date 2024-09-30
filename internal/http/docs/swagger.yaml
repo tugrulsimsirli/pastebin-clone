@@ -14,6 +14,12 @@ definitions:
         example: Invalid credentials
         type: string
     type: object
+  models.IdResponseModel:
+    properties:
+      id:
+        example: b8bba550-3b82-4fa8-9617-8d3c0ab69989
+        type: string
+    type: object
   models.LoginRequestModel:
     properties:
       password:
@@ -68,13 +74,6 @@ definitions:
       id:
         example: b8bba550-3b82-4fa8-9617-8d3c0ab69989
         type: string
-    type: object
-  models.SnippetListResponseModel:
-    properties:
-      snippets:
-        items:
-          $ref: '#/definitions/models.SnippetResponseModel'
-        type: array
     type: object
   models.SnippetResponseModel:
     properties:
@@ -206,7 +205,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SnippetListResponseModel'
+            items:
+              $ref: '#/definitions/models.SnippetResponseModel'
+            type: array
         "400":
           description: Bad Request
           schema:
@@ -235,7 +236,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.SnippetResponseModel'
+            $ref: '#/definitions/models.IdResponseModel'
         "400":
           description: Bad Request
           schema:
