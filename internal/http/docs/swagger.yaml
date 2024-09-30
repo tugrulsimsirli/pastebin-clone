@@ -1,4 +1,13 @@
 definitions:
+  models.CreateSnippetRequestModel:
+    properties:
+      content:
+        example: This is a sample snippet content
+        type: string
+      title:
+        example: Sample Snippet
+        type: string
+    type: object
   models.ErrorResponse:
     properties:
       message:
@@ -60,10 +69,43 @@ definitions:
         example: b8bba550-3b82-4fa8-9617-8d3c0ab69989
         type: string
     type: object
+  models.SnippetListResponseModel:
+    properties:
+      snippets:
+        items:
+          $ref: '#/definitions/models.SnippetResponseModel'
+        type: array
+    type: object
+  models.SnippetResponseModel:
+    properties:
+      content:
+        type: string
+      created_date:
+        type: string
+      id:
+        type: string
+      is_deleted:
+        type: boolean
+      modified_date:
+        type: string
+      title:
+        type: string
+      view_count:
+        type: integer
+    type: object
+  models.UpdateSnippetRequestModel:
+    properties:
+      content:
+        example: Updated snippet content
+        type: string
+      title:
+        example: Updated Snippet
+        type: string
+    type: object
 info:
   contact: {}
 paths:
-  /login:
+  /api/v1/login:
     post:
       consumes:
       - application/json
@@ -92,8 +134,8 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: User login
       tags:
-      - auth
-  /refresh-token:
+      - Auth
+  /api/v1/refresh-token:
     post:
       consumes:
       - application/json
@@ -122,8 +164,8 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Refresh JWT token
       tags:
-      - auth
-  /register:
+      - Auth
+  /api/v1/register:
     post:
       consumes:
       - application/json
@@ -152,5 +194,146 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: User registration
       tags:
-      - auth
+      - Auth
+  /api/v1/snippet:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all snippets for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SnippetListResponseModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get user snippets
+      tags:
+      - Snippet
+    post:
+      consumes:
+      - application/json
+      description: Creates a new snippet for the authenticated user
+      parameters:
+      - description: Snippet data
+        in: body
+        name: snippet
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateSnippetRequestModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SnippetResponseModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new snippet
+      tags:
+      - Snippet
+  /api/v1/snippet/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a snippet for the authenticated user by ID
+      parameters:
+      - description: Snippet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete a snippet
+      tags:
+      - Snippet
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a snippet for the authenticated user by ID
+      parameters:
+      - description: Snippet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SnippetResponseModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get snippet by ID
+      tags:
+      - Snippet
+    patch:
+      consumes:
+      - application/json
+      description: Updates a snippet for the authenticated user by ID
+      parameters:
+      - description: Snippet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Snippet data
+        in: body
+        name: snippet
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateSnippetRequestModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SnippetResponseModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update a snippet
+      tags:
+      - Snippet
 swagger: "2.0"

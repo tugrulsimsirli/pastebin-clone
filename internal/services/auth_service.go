@@ -1,8 +1,10 @@
+// auth_service.go
 package services
 
 import (
 	"errors"
 	"pastebin-clone/configs"
+	"pastebin-clone/internal/http/models"
 	"pastebin-clone/internal/repositories"
 	"time"
 
@@ -13,64 +15,81 @@ import (
 
 type AuthServiceInterface interface {
 	RegisterUser(username string, password string) (uuid.UUID, error)
-	Login(username string, password string) (string, string, string, error)
-	RefreshAccessToken(refreshToken string) (string, string, error)
+	Login(username string, password string) (*models.LoginResponseModel, error)
+	RefreshAccessToken(refreshToken string) (*models.RefreshTokenResponseModel, error)
 }
 
 type AuthService struct {
-	Repo repositories.AuthRepositoryInterface // Dependency Injection ile repository alınıyor
+	AuthRepo repositories.AuthRepositoryInterface
+	UserRepo repositories.UserRepositoryInterface
 }
 
-func NewAuthService(repo repositories.AuthRepositoryInterface) AuthServiceInterface {
+// Dönüş tipi sadece AuthServiceInterface olacak şekilde düzeltildi
+func NewAuthService(authRepo repositories.AuthRepositoryInterface, userRepo repositories.UserRepositoryInterface) AuthServiceInterface {
 	return &AuthService{
-		Repo: repo,
+		AuthRepo: authRepo,
+		UserRepo: userRepo,
 	}
 }
 
 func (s *AuthService) RegisterUser(username string, password string) (uuid.UUID, error) {
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return s.Repo.CreateUser(username, string(hashedPassword))
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return s.AuthRepo.CreateUser(username, string(hashedPassword))
 }
 
-func (s *AuthService) Login(username string, password string) (string, string, string, error) {
-	storedUser, err := s.Repo.GetUserByUsername(username)
+func (s *AuthService) Login(username string, password string) (*models.LoginResponseModel, error) {
+	storedUser, err := s.UserRepo.GetUserByUsername(username)
 	if err != nil {
-		return "", "", "", errors.New("Invalid credentials")
+		return nil, errors.New("invalid credentials")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(password)); err != nil {
-		return "", "", "", errors.New("Invalid credentials")
+		return nil, errors.New("invalid credentials")
 	}
 
 	accessToken, accessTokenClaims, err := createToken(storedUser.ID.String(), time.Now().Add(15*time.Minute).Unix(), "access")
 	if err != nil {
-		return "", "", "", err
+		return nil, err
 	}
 	refreshToken, _, err := createToken(storedUser.ID.String(), time.Now().Add(7*24*time.Hour).Unix(), "refresh")
 	if err != nil {
-		return "", "", "", err
+		return nil, err
 	}
 
 	expireDate := time.Unix(accessTokenClaims["exp"].(int64), 0).Format(time.RFC3339)
 
-	return accessToken, refreshToken, expireDate, nil
+	response := &models.LoginResponseModel{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ExpireDate:   expireDate,
+	}
+
+	return response, nil
 }
 
-func (s *AuthService) RefreshAccessToken(refreshToken string) (string, string, error) {
+func (s *AuthService) RefreshAccessToken(refreshToken string) (*models.RefreshTokenResponseModel, error) {
 	claims, err := validateToken(refreshToken, "refresh")
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
 	userID := claims["sub"].(string)
 	accessToken, accessTokenClaims, err := createToken(userID, time.Now().Add(15*time.Minute).Unix(), "access")
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
 	expireDate := time.Unix(accessTokenClaims["exp"].(int64), 0).Format(time.RFC3339)
 
-	return accessToken, expireDate, nil
+	response := &models.RefreshTokenResponseModel{
+		AccessToken: accessToken,
+		ExpireDate:  expireDate,
+	}
+
+	return response, nil
 }
 
 func createToken(subject string, expirationTime int64, tokenType string) (string, jwt.MapClaims, error) {

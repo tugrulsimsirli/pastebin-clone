@@ -2,14 +2,13 @@ package repositories
 
 import (
 	"pastebin-clone/internal/db"
-	"pastebin-clone/internal/repositories/dto"
+	data_models "pastebin-clone/internal/db/data-models"
 
 	"github.com/google/uuid"
 )
 
 type AuthRepositoryInterface interface {
 	CreateUser(username string, password string) (uuid.UUID, error)
-	GetUserByUsername(username string) (*dto.User, error)
 }
 
 type AuthRepository struct{}
@@ -19,7 +18,7 @@ func NewAuthRepository() AuthRepositoryInterface {
 }
 
 func (r *AuthRepository) CreateUser(username string, hashedPassword string) (uuid.UUID, error) {
-	newUser := dto.User{
+	newUser := data_models.User{
 		ID:       uuid.New(),
 		Username: username,
 		Password: hashedPassword,
@@ -30,12 +29,4 @@ func (r *AuthRepository) CreateUser(username string, hashedPassword string) (uui
 	}
 
 	return newUser.ID, nil
-}
-
-func (r *AuthRepository) GetUserByUsername(username string) (*dto.User, error) {
-	var user dto.User
-	if err := db.DB.Where("username = ?", username).First(&user).Error; err != nil {
-		return nil, err
-	}
-	return &user, nil
 }

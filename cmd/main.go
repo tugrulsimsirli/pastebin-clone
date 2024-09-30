@@ -2,10 +2,8 @@ package main
 
 import (
 	"pastebin-clone/configs"
+	"pastebin-clone/internal/bootstrap"
 	"pastebin-clone/internal/db"
-	"pastebin-clone/internal/http/handlers"
-	"pastebin-clone/internal/repositories"
-	"pastebin-clone/internal/services"
 
 	"github.com/labstack/echo/v4"
 
@@ -28,13 +26,8 @@ func main() {
 		return c.JSON(200, map[string]string{"message": "API is up and running!"})
 	})
 
-	authRepo := repositories.NewAuthRepository()
-	authService := services.NewAuthService(authRepo)
-	authHandler := handlers.NewAuthHandler(authService)
-
-	e.POST("/register", authHandler.Register)
-	e.POST("/login", authHandler.Login)
-	e.POST("/refresh-token", authHandler.RefreshToken)
+	// Dependency injection
+	bootstrap.RegisterHandlers(e)
 
 	e.Start(":8080")
 }
