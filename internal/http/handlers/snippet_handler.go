@@ -36,6 +36,9 @@ func (h *SnippetHandler) GetSnippetsOwn(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: err.Error()})
 	}
+	if snippets == nil {
+		return c.NoContent(http.StatusNoContent)
+	}
 	return c.JSON(http.StatusOK, snippets)
 }
 
@@ -47,9 +50,10 @@ func (h *SnippetHandler) GetSnippetsOwn(c echo.Context) error {
 // @Produce      json
 // @Param        userId path string true "Snippet ID"
 // @Success      200  {object} []models.SnippetResponseModel
+// @Success      204  "No Content"
 // @Failure      400  {object} models.ErrorResponse
 // @Failure      500  {object} models.ErrorResponse
-// @Router       /api/v1/snippet/{userId} [get]
+// @Router       /api/v1/snippet/user/{userId} [get]
 func (h *SnippetHandler) GetSnippetsByUserID(c echo.Context) error {
 	userID := uuid.MustParse(c.Param("userId"))
 	snippets, err := h.SnippetService.GetAllSnippetsByUserID(userID)
@@ -79,6 +83,9 @@ func (h *SnippetHandler) GetSnippet(c echo.Context) error {
 	snippet, err := h.SnippetService.GetSnippetByID(userID, snippetID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: err.Error()})
+	}
+	if snippet == nil {
+		return c.NoContent(http.StatusNoContent)
 	}
 	return c.JSON(http.StatusOK, snippet)
 }

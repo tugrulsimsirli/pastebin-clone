@@ -28,12 +28,19 @@ func NewSnippetRepository() SnippetRepositoryInterface {
 
 func (r *SnippetRepository) GetAllSnippetsOwn(userID uuid.UUID) (*[]dto.SnippetDto, error) {
 	var snippets []data_models.Snippet
-	if err := db.DB.Where("user_id = ?", userID).Find(&snippets).Error; err != nil {
+	err := db.DB.Where("user_id = ?", userID).Find(&snippets).Error
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		log.Println(err)
 		return nil, err
 	}
 
+	if len(snippets) == 0 {
+		return nil, nil
+	}
+
 	response := &[]dto.SnippetDto{}
-	err := mapper.Map(snippets, response)
+	err = mapper.Map(snippets, response)
 	if err != nil {
 		return nil, err
 	}
@@ -65,12 +72,19 @@ func (r *SnippetRepository) GetAllSnippetsByUserID(userID uuid.UUID) (*[]dto.Sni
 
 func (r *SnippetRepository) GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (*dto.SnippetDto, error) {
 	var snippet data_models.Snippet
-	if err := db.DB.Where("user_id = ? AND id = ?", userID, snippetID).First(&snippet).Error; err != nil {
+	err := db.DB.Where("user_id = ? AND id = ?", userID, snippetID).First(&snippet).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		log.Println(err)
 		return nil, err
 	}
 
 	response := &dto.SnippetDto{}
-	err := mapper.Map(snippet, response)
+	err = mapper.Map(snippet, response)
 	if err != nil {
 		return nil, err
 	}

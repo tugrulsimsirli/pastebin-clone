@@ -348,7 +348,7 @@ paths:
       summary: Update a snippet
       tags:
       - Snippet
-  /api/v1/snippet/{userId}:
+  /api/v1/snippet/user/{userId}:
     get:
       consumes:
       - application/json
@@ -368,6 +368,8 @@ paths:
             items:
               $ref: '#/definitions/models.SnippetResponseModel'
             type: array
+        "204":
+          description: No Content
         "400":
           description: Bad Request
           schema:
