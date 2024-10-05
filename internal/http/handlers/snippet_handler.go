@@ -27,6 +27,7 @@ func NewSnippetHandler(snippetService services.SnippetServiceInterface) *Snippet
 // @Accept       json
 // @Produce      json
 // @Success      200  {object} []models.SnippetResponseModel
+// @Success      204  "No Content"
 // @Failure      400  {object} models.ErrorResponse
 // @Failure      500  {object} models.ErrorResponse
 // @Router       /api/v1/snippet [get]
@@ -74,6 +75,7 @@ func (h *SnippetHandler) GetSnippetsByUserID(c echo.Context) error {
 // @Produce      json
 // @Param        id path string true "Snippet ID"
 // @Success      200  {object} models.SnippetResponseModel
+// @Success      204  "No Content"
 // @Failure      400  {object} models.ErrorResponse
 // @Failure      500  {object} models.ErrorResponse
 // @Router       /api/v1/snippet/{id} [get]

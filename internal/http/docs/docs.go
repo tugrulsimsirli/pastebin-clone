@@ -176,6 +176,9 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "204": {
+                        "description": "No Content"
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -313,6 +316,9 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.SnippetResponseModel"
                         }
+                    },
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",

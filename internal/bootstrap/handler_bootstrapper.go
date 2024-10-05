@@ -32,10 +32,10 @@ func RegisterHandlers(e *echo.Echo) {
 	apiV1Auth.POST("/refresh-token", authHandler.RefreshToken)
 
 	// Snippet endpoints
-	apiV1Snippet.GET("/", snippetHandler.GetSnippetsOwn, middlewares.JWTMiddleware)
+	apiV1Snippet.GET("", snippetHandler.GetSnippetsOwn, middlewares.JWTMiddleware)
 	apiV1Snippet.GET("/user/:userId", snippetHandler.GetSnippetsByUserID, middlewares.JWTMiddleware)
 	apiV1Snippet.GET("/:id", snippetHandler.GetSnippet, middlewares.JWTMiddleware)
-	apiV1Snippet.POST("/", snippetHandler.CreateSnippet, middlewares.JWTMiddleware)
+	apiV1Snippet.POST("", snippetHandler.CreateSnippet, middlewares.JWTMiddleware)
 	apiV1Snippet.PATCH("/:id", snippetHandler.UpdateSnippet, middlewares.JWTMiddleware)
 	apiV1Snippet.DELETE("/:id", snippetHandler.DeleteSnippet, middlewares.JWTMiddleware)
 }

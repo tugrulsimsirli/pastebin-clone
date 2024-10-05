@@ -219,6 +219,8 @@ paths:
             items:
               $ref: '#/definitions/models.SnippetResponseModel'
             type: array
+        "204":
+          description: No Content
         "400":
           description: Bad Request
           schema:
@@ -303,6 +305,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.SnippetResponseModel'
+        "204":
+          description: No Content
         "400":
           description: Bad Request
           schema:
