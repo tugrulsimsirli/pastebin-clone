@@ -1,4 +1,10 @@
 definitions:
+  models.BooleanRequestModel:
+    properties:
+      bool:
+        example: true
+        type: boolean
+    type: object
   models.CreateSnippetRequestModel:
     properties:
       content:
@@ -87,6 +93,8 @@ definitions:
       id:
         type: string
       is_deleted:
+        type: boolean
+      is_public:
         type: boolean
       modified_date:
         type: string
@@ -316,12 +324,12 @@ paths:
         name: id
         required: true
         type: string
-      - description: Snippet data
+      - description: Snippet IsPublic data
         in: body
-        name: snippet
+        name: snippet_is_public
         required: true
         schema:
-          $ref: '#/definitions/models.UpdateSnippetRequestModel'
+          $ref: '#/definitions/models.BooleanRequestModel'
       produces:
       - application/json
       responses:
@@ -348,7 +356,7 @@ paths:
       parameters:
       - description: Snippet ID
         in: path
-        name: id
+        name: userId
         required: true
         type: string
       produces:

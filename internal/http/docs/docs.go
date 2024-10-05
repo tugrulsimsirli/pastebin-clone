@@ -338,12 +338,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Snippet data",
-                        "name": "snippet",
+                        "description": "Snippet IsPublic data",
+                        "name": "snippet_is_public",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateSnippetRequestModel"
+                            "$ref": "#/definitions/models.BooleanRequestModel"
                         }
                     }
                 ],
@@ -386,7 +386,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Snippet ID",
-                        "name": "id",
+                        "name": "userId",
                         "in": "path",
                         "required": true
                     }
@@ -418,6 +418,15 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.BooleanRequestModel": {
+            "type": "object",
+            "properties": {
+                "bool": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "models.CreateSnippetRequestModel": {
             "type": "object",
             "properties": {
@@ -545,6 +554,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "is_deleted": {
+                    "type": "boolean"
+                },
+                "is_public": {
                     "type": "boolean"
                 },
                 "modified_date": {

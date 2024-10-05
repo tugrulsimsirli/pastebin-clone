@@ -45,7 +45,7 @@ func (h *SnippetHandler) GetSnippetsOwn(c echo.Context) error {
 // @Tags         Snippet
 // @Accept       json
 // @Produce      json
-// @Param        id path string true "Snippet ID"
+// @Param        userId path string true "Snippet ID"
 // @Success      200  {object} []models.SnippetResponseModel
 // @Failure      400  {object} models.ErrorResponse
 // @Failure      500  {object} models.ErrorResponse
@@ -55,6 +55,9 @@ func (h *SnippetHandler) GetSnippetsByUserID(c echo.Context) error {
 	snippets, err := h.SnippetService.GetAllSnippetsByUserID(userID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: err.Error()})
+	}
+	if snippets == nil {
+		return c.NoContent(http.StatusNoContent)
 	}
 	return c.JSON(http.StatusOK, snippets)
 }

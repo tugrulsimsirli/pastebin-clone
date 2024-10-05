@@ -51,6 +51,10 @@ func (s *SnippetService) GetAllSnippetsByUserID(userID uuid.UUID) (*[]models.Sni
 		return nil, err
 	}
 
+	if snippets == nil {
+		return nil, nil
+	}
+
 	response := &[]models.SnippetResponseModel{}
 	err = mapper.Map(snippets, response)
 	if err != nil {
