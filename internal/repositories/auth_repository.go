@@ -8,7 +8,7 @@ import (
 )
 
 type AuthRepositoryInterface interface {
-	CreateUser(username string, password string) (uuid.UUID, error)
+	CreateUser(email string, username string, password string) (uuid.UUID, error)
 }
 
 type AuthRepository struct{}
@@ -17,9 +17,10 @@ func NewAuthRepository() AuthRepositoryInterface {
 	return &AuthRepository{}
 }
 
-func (r *AuthRepository) CreateUser(username string, hashedPassword string) (uuid.UUID, error) {
+func (r *AuthRepository) CreateUser(email string, username string, hashedPassword string) (uuid.UUID, error) {
 	newUser := data_models.User{
 		ID:       uuid.New(),
+		Email:    email,
 		Username: username,
 		Password: hashedPassword,
 	}

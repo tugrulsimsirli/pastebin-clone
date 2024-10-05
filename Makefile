@@ -1,7 +1,7 @@
 # Makefile
 
 SWAGGER_OUTPUT_DIR = ./internal/http/docs
-SWAGGER_SEARCH_DIR = ./cmd,./internal/http
+SWAGGER_SEARCH_DIR = ./cmd,./internal
 
 .PHONY: swagger build
 

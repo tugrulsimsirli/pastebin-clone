@@ -13,8 +13,8 @@ import (
 )
 
 type AuthServiceInterface interface {
-	RegisterUser(username string, password string) (uuid.UUID, error)
-	Login(username string, password string) (*models.LoginResponseModel, error)
+	RegisterUser(email string, username string, password string) (uuid.UUID, error)
+	Login(email string, password string) (*models.LoginResponseModel, error)
 	RefreshAccessToken(refreshToken string) (*models.RefreshTokenResponseModel, error)
 }
 
@@ -30,16 +30,16 @@ func NewAuthService(authRepo repositories.AuthRepositoryInterface, userRepo repo
 	}
 }
 
-func (s *AuthService) RegisterUser(username string, password string) (uuid.UUID, error) {
+func (s *AuthService) RegisterUser(email string, username string, password string) (uuid.UUID, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return uuid.Nil, err
 	}
-	return s.AuthRepo.CreateUser(username, string(hashedPassword))
+	return s.AuthRepo.CreateUser(email, username, string(hashedPassword))
 }
 
-func (s *AuthService) Login(username string, password string) (*models.LoginResponseModel, error) {
-	storedUser, err := s.UserRepo.GetUserByUsername(username)
+func (s *AuthService) Login(email string, password string) (*models.LoginResponseModel, error) {
+	storedUser, err := s.UserRepo.GetUserByEmail(email)
 	if err != nil {
 		return nil, err
 	}

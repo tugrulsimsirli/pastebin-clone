@@ -30,9 +30,29 @@ func NewSnippetHandler(snippetService services.SnippetServiceInterface) *Snippet
 // @Failure      400  {object} models.ErrorResponse
 // @Failure      500  {object} models.ErrorResponse
 // @Router       /api/v1/snippet [get]
-func (h *SnippetHandler) GetSnippets(c echo.Context) error {
+func (h *SnippetHandler) GetSnippetsOwn(c echo.Context) error {
 	userID := c.Get("userID").(uuid.UUID)
-	snippets, err := h.SnippetService.GetAllSnippetsByUser(userID)
+	snippets, err := h.SnippetService.GetAllSnippetsOwn(userID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, snippets)
+}
+
+// GetSnippets godoc
+// @Summary      Get user snippets
+// @Description  Retrieves all snippets for the authenticated user
+// @Tags         Snippet
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Snippet ID"
+// @Success      200  {object} []models.SnippetResponseModel
+// @Failure      400  {object} models.ErrorResponse
+// @Failure      500  {object} models.ErrorResponse
+// @Router       /api/v1/snippet/{userId} [get]
+func (h *SnippetHandler) GetSnippetsByUserID(c echo.Context) error {
+	userID := uuid.MustParse(c.Param("userId"))
+	snippets, err := h.SnippetService.GetAllSnippetsByUserID(userID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: err.Error()})
 	}
@@ -106,6 +126,33 @@ func (h *SnippetHandler) UpdateSnippet(c echo.Context) error {
 	}
 
 	snippet, err := h.SnippetService.UpdateSnippet(userID, snippetID, req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, snippet)
+}
+
+// UpdateSnippet godoc
+// @Summary      Update a snippet
+// @Description  Updates a snippet for the authenticated user by ID
+// @Tags         Snippet
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Snippet ID"
+// @Param        snippet_is_public body models.BooleanRequestModel true "Snippet IsPublic data"
+// @Success      200  {object} models.SnippetResponseModel
+// @Failure      400  {object} models.ErrorResponse
+// @Failure      500  {object} models.ErrorResponse
+// @Router       /api/v1/snippet/{id} [patch]
+func (h *SnippetHandler) UpdateSnippetIsPublic(c echo.Context) error {
+	userID := c.Get("userID").(uuid.UUID)
+	snippetID := uuid.MustParse(c.Param("id"))
+	var req models.BooleanRequestModel
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Message: "Invalid input"})
+	}
+
+	snippet, err := h.SnippetService.UpdateSnippetIsPublic(userID, snippetID, req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: err.Error()})
 	}

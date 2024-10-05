@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/login": {
+        "/api/v1/auth/login": {
             "post": {
                 "description": "Logs in a user and returns a JWT token",
                 "consumes": [
@@ -61,7 +61,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/refresh-token": {
+        "/api/v1/auth/refresh-token": {
             "post": {
                 "description": "Refreshes an access token using a refresh token",
                 "consumes": [
@@ -107,7 +107,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/register": {
+        "/api/v1/auth/register": {
             "post": {
                 "description": "Registers a new user and returns success message",
                 "consumes": [
@@ -368,6 +368,53 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/snippet/{userId}": {
+            "get": {
+                "description": "Retrieves all snippets for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Snippet"
+                ],
+                "summary": "Get user snippets",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Snippet ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SnippetResponseModel"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -405,13 +452,13 @@ const docTemplate = `{
         "models.LoginRequestModel": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "johndoe@johndoe.com"
+                },
                 "password": {
                     "type": "string",
                     "example": "password"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "johndoe"
                 }
             }
         },
@@ -462,6 +509,10 @@ const docTemplate = `{
         "models.RegisterRequestModel": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "johndoe@johndoe.com"
+                },
                 "password": {
                     "type": "string",
                     "example": "password"

@@ -23,17 +23,19 @@ func RegisterHandlers(e *echo.Echo) {
 	authHandler := handlers.NewAuthHandler(authService)
 	snippetHandler := handlers.NewSnippetHandler(snippetService) // Snippet handler
 
-	apiV1 := e.Group("/api/v1")
+	apiV1Auth := e.Group("/api/v1/auth")
+	apiV1Snippet := e.Group("/api/v1/snippet")
 
 	// Auth endpoints
-	apiV1.POST("/register", authHandler.Register)
-	apiV1.POST("/login", authHandler.Login)
-	apiV1.POST("/refresh-token", authHandler.RefreshToken)
+	apiV1Auth.POST("/register", authHandler.Register)
+	apiV1Auth.POST("/login", authHandler.Login)
+	apiV1Auth.POST("/refresh-token", authHandler.RefreshToken)
 
 	// Snippet endpoints
-	apiV1.GET("/snippet", snippetHandler.GetSnippets, middlewares.JWTMiddleware)
-	apiV1.GET("/snippet/:id", snippetHandler.GetSnippet, middlewares.JWTMiddleware)
-	apiV1.POST("/snippet", snippetHandler.CreateSnippet, middlewares.JWTMiddleware)
-	apiV1.PATCH("/snippet/:id", snippetHandler.UpdateSnippet, middlewares.JWTMiddleware)
-	apiV1.DELETE("/snippet/:id", snippetHandler.DeleteSnippet, middlewares.JWTMiddleware)
+	apiV1Snippet.GET("", snippetHandler.GetSnippetsOwn, middlewares.JWTMiddleware)
+	apiV1Snippet.GET("/:userId", snippetHandler.GetSnippetsByUserID, middlewares.JWTMiddleware)
+	apiV1Snippet.GET("/:id", snippetHandler.GetSnippet, middlewares.JWTMiddleware)
+	apiV1Snippet.POST("", snippetHandler.CreateSnippet, middlewares.JWTMiddleware)
+	apiV1Snippet.PATCH("/:id", snippetHandler.UpdateSnippet, middlewares.JWTMiddleware)
+	apiV1Snippet.DELETE("/:id", snippetHandler.DeleteSnippet, middlewares.JWTMiddleware)
 }

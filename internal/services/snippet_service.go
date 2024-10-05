@@ -11,10 +11,12 @@ import (
 )
 
 type SnippetServiceInterface interface {
-	GetAllSnippetsByUser(userID uuid.UUID) (*[]models.SnippetResponseModel, error)
+	GetAllSnippetsOwn(userID uuid.UUID) (*[]models.SnippetResponseModel, error)
+	GetAllSnippetsByUserID(userID uuid.UUID) (*[]models.SnippetResponseModel, error)
 	GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (*models.SnippetResponseModel, error)
 	CreateSnippet(userID uuid.UUID, req models.CreateSnippetRequestModel) (*models.IdResponseModel, error)
 	UpdateSnippet(userID uuid.UUID, snippetID uuid.UUID, req models.UpdateSnippetRequestModel) (*models.SnippetResponseModel, error)
+	UpdateSnippetIsPublic(userID uuid.UUID, snippetID uuid.UUID, req models.BooleanRequestModel) (*models.SnippetResponseModel, error)
 	DeleteSnippet(userID uuid.UUID, snippetID uuid.UUID) error
 }
 
@@ -28,14 +30,28 @@ func NewSnippetService(repo repositories.SnippetRepositoryInterface) SnippetServ
 	}
 }
 
-func (s *SnippetService) GetAllSnippetsByUser(userID uuid.UUID) (*[]models.SnippetResponseModel, error) {
-	snippets, err := s.Repo.GetAllSnippetsByUser(userID)
+func (s *SnippetService) GetAllSnippetsOwn(userID uuid.UUID) (*[]models.SnippetResponseModel, error) {
+	snippets, err := s.Repo.GetAllSnippetsOwn(userID)
 	if err != nil {
 		return nil, err
 	}
 
 	response := &[]models.SnippetResponseModel{}
+	err = mapper.Map(snippets, response)
+	if err != nil {
+		return nil, err
+	}
 
+	return response, nil
+}
+
+func (s *SnippetService) GetAllSnippetsByUserID(userID uuid.UUID) (*[]models.SnippetResponseModel, error) {
+	snippets, err := s.Repo.GetAllSnippetsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &[]models.SnippetResponseModel{}
 	err = mapper.Map(snippets, response)
 	if err != nil {
 		return nil, err
@@ -51,7 +67,6 @@ func (s *SnippetService) GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (
 	}
 
 	response := &models.SnippetResponseModel{}
-
 	err = mapper.Map(snippet, response)
 	if err != nil {
 		return nil, err
@@ -62,7 +77,6 @@ func (s *SnippetService) GetSnippetByID(userID uuid.UUID, snippetID uuid.UUID) (
 
 func (s *SnippetService) CreateSnippet(userID uuid.UUID, req models.CreateSnippetRequestModel) (*models.IdResponseModel, error) {
 	id := uuid.New()
-
 	snippet := &data_models.Snippet{
 		ID:           id,
 		UserID:       userID,
@@ -79,43 +93,59 @@ func (s *SnippetService) CreateSnippet(userID uuid.UUID, req models.CreateSnippe
 		return nil, err
 	}
 
-	response := &models.IdResponseModel{
-		ID: id,
-	}
-
+	response := &models.IdResponseModel{ID: id}
 	return response, nil
 }
 
 func (s *SnippetService) UpdateSnippet(userID uuid.UUID, snippetID uuid.UUID, req models.UpdateSnippetRequestModel) (*models.SnippetResponseModel, error) {
 	snippet, err := s.Repo.GetSnippetByID(userID, snippetID)
-	if err != nil {
+	if err != nil || snippet == nil {
 		return nil, err
 	}
 
+	updates := map[string]interface{}{}
 	if req.Title != nil {
-		snippet.Title = *req.Title
+		updates["title"] = *req.Title
 	}
 	if req.Content != nil {
-		snippet.Content = *req.Content
+		updates["content"] = *req.Content
 	}
-	snippet.ModifiedDate = time.Now()
+	updates["modified_date"] = time.Now()
 
-	updatedSnippet, err := s.Repo.UpdateSnippet(&data_models.Snippet{
-		ID:           snippet.ID,
-		UserID:       snippet.UserID,
-		Title:        snippet.Title,
-		Content:      snippet.Content,
-		ViewCount:    snippet.ViewCount,
-		CreatedDate:  snippet.CreatedDate,
-		ModifiedDate: snippet.ModifiedDate,
-		IsDeleted:    snippet.IsDeleted,
-	})
+	if err := s.Repo.UpdateFields(snippetID, updates); err != nil {
+		return nil, err
+	}
+
+	updatedSnippet, err := s.Repo.GetSnippetByID(userID, snippetID)
 	if err != nil {
 		return nil, err
 	}
 
 	response := &models.SnippetResponseModel{}
+	err = mapper.Map(updatedSnippet, response)
+	if err != nil {
+		return nil, err
+	}
 
+	return response, nil
+}
+
+func (s *SnippetService) UpdateSnippetIsPublic(userID uuid.UUID, snippetID uuid.UUID, req models.BooleanRequestModel) (*models.SnippetResponseModel, error) {
+	updates := map[string]interface{}{
+		"is_public":     req.Bool,
+		"modified_date": time.Now(),
+	}
+
+	if err := s.Repo.UpdateFields(snippetID, updates); err != nil {
+		return nil, err
+	}
+
+	updatedSnippet, err := s.Repo.GetSnippetByID(userID, snippetID)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &models.SnippetResponseModel{}
 	err = mapper.Map(updatedSnippet, response)
 	if err != nil {
 		return nil, err
@@ -125,10 +155,5 @@ func (s *SnippetService) UpdateSnippet(userID uuid.UUID, snippetID uuid.UUID, re
 }
 
 func (s *SnippetService) DeleteSnippet(userID uuid.UUID, snippetID uuid.UUID) error {
-	snippet, err := s.Repo.GetSnippetByID(userID, snippetID)
-	if err != nil {
-		return err
-	}
-
-	return s.Repo.DeleteSnippet(snippet.ID)
+	return s.Repo.DeleteSnippet(snippetID)
 }

@@ -3,6 +3,7 @@ package models
 import "github.com/google/uuid"
 
 type RegisterRequestModel struct {
+	Email    string `json:"email" example:"johndoe@johndoe.com"`
 	Username string `json:"username" example:"johndoe"`
 	Password string `json:"password" example:"password"`
 }
@@ -12,7 +13,7 @@ type RegisterResponseModel struct {
 }
 
 type LoginRequestModel struct {
-	Username string `json:"username" example:"johndoe"`
+	Email    string `json:"email" example:"johndoe@johndoe.com"`
 	Password string `json:"password" example:"password"`
 }
 

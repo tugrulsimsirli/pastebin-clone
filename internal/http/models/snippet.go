@@ -21,6 +21,7 @@ type SnippetResponseModel struct {
 	Title        string    `json:"title"`
 	Content      string    `json:"content"`
 	ViewCount    uint      `json:"view_count"`
+	IsPublic     bool      `json:"is_public"`
 	CreatedDate  time.Time `json:"created_date"`
 	ModifiedDate time.Time `json:"modified_date"`
 	IsDeleted    bool      `json:"is_deleted"`
