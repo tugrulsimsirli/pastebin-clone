@@ -424,6 +424,44 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/user": {
+            "get": {
+                "description": "Retrieves all user data for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user detail",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserDetailResponseModel"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -494,6 +532,10 @@ const docTemplate = `{
                 "refresh_token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "b8bba550-3b82-4fa8-9617-8d3c0ab69989"
                 }
             }
         },
@@ -589,6 +631,15 @@ const docTemplate = `{
                 "title": {
                     "type": "string",
                     "example": "Updated Snippet"
+                }
+            }
+        },
+        "models.UserDetailResponseModel": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string",
+                    "example": "johndoe"
                 }
             }
         }

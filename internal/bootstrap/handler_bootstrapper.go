@@ -13,23 +13,29 @@ func RegisterHandlers(e *echo.Echo) {
 	// Repositories
 	authRepo := repositories.NewAuthRepository()
 	userRepo := repositories.NewUserRepository()
-	snippetRepo := repositories.NewSnippetRepository() // Snippet repository
+	snippetRepo := repositories.NewSnippetRepository()
 
 	// Services
 	authService := services.NewAuthService(authRepo, userRepo)
-	snippetService := services.NewSnippetService(snippetRepo) // Snippet service
+	userService := services.NewUserService(userRepo)
+	snippetService := services.NewSnippetService(snippetRepo)
 
 	// Handlers
 	authHandler := handlers.NewAuthHandler(authService)
-	snippetHandler := handlers.NewSnippetHandler(snippetService) // Snippet handler
+	userHandler := handlers.NewUserHandler(userService)
+	snippetHandler := handlers.NewSnippetHandler(snippetService)
 
 	apiV1Auth := e.Group("/api/v1/auth")
 	apiV1Snippet := e.Group("/api/v1/snippet")
+	apiV1User := e.Group("/api/v1/user")
 
 	// Auth endpoints
 	apiV1Auth.POST("/register", authHandler.Register)
 	apiV1Auth.POST("/login", authHandler.Login)
 	apiV1Auth.POST("/refresh-token", authHandler.RefreshToken)
+
+	// User endpoints
+	apiV1User.GET("", userHandler.GetUserDetail, middlewares.JWTMiddleware)
 
 	// Snippet endpoints
 	apiV1Snippet.GET("", snippetHandler.GetSnippetsOwn, middlewares.JWTMiddleware)

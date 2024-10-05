@@ -65,11 +65,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, models.LoginResponseModel{
-		AccessToken:  loginResponseModel.AccessToken,
-		RefreshToken: loginResponseModel.RefreshToken,
-		ExpireDate:   loginResponseModel.ExpireDate,
-	})
+	return c.JSON(http.StatusOK, loginResponseModel)
 }
 
 // RefreshToken godoc

@@ -18,9 +18,10 @@ type LoginRequestModel struct {
 }
 
 type LoginResponseModel struct {
-	AccessToken  string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."`
-	RefreshToken string `json:"refresh_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
-	ExpireDate   string `json:"expire_date" example:"1970-01-01 00:00:00"`
+	UserID       uuid.UUID `json:"user_id" example:"b8bba550-3b82-4fa8-9617-8d3c0ab69989"`
+	AccessToken  string    `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ..."`
+	RefreshToken string    `json:"refresh_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
+	ExpireDate   string    `json:"expire_date" example:"1970-01-01 00:00:00"`
 }
 
 type RefreshTokenRequestModel struct {

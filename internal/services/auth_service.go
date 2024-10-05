@@ -60,6 +60,7 @@ func (s *AuthService) Login(email string, password string) (*models.LoginRespons
 	expireDate := time.Unix(accessTokenClaims["exp"].(int64), 0).Format(time.RFC3339)
 
 	response := &models.LoginResponseModel{
+		UserID:       storedUser.ID,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ExpireDate:   expireDate,

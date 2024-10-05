@@ -7,3 +7,7 @@ type UserDto struct {
 	Username string    `json:"username" example:"johndoe"`
 	Password string    `json:"password" example:"password"`
 }
+
+type UserDetailDto struct {
+	Username string `json:"username" example:"johndoe"`
+}

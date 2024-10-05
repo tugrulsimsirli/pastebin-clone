@@ -46,6 +46,9 @@ definitions:
       refresh_token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
+      user_id:
+        example: b8bba550-3b82-4fa8-9617-8d3c0ab69989
+        type: string
     type: object
   models.RefreshTokenRequestModel:
     properties:
@@ -110,6 +113,12 @@ definitions:
         type: string
       title:
         example: Updated Snippet
+        type: string
+    type: object
+  models.UserDetailResponseModel:
+    properties:
+      username:
+        example: johndoe
         type: string
     type: object
 info:
@@ -385,4 +394,29 @@ paths:
       summary: Get user snippets
       tags:
       - Snippet
+  /api/v1/user:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all user data for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserDetailResponseModel'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get user detail
+      tags:
+      - User
 swagger: "2.0"
